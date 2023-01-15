@@ -1,6 +1,7 @@
 package it.thundyy.multieconomy.database;
 
 import it.thundyy.multieconomy.EconomyPlugin;
+import it.thundyy.multieconomy.currency.registry.CurrencyRegistry;
 import it.thundyy.multieconomy.database.enums.Query;
 import it.thundyy.multieconomy.database.helper.DataHelper;
 import it.thundyy.multieconomy.user.User;
@@ -29,7 +30,15 @@ public class UserDataManipulator {
     }
 
     public void register(UUID uuid) {
-        // TODO: 15/01/2023
+        CompletableFuture.runAsync(() -> {
+            CurrencyRegistry.getInstance().getAll().forEach(currency -> {
+                try (Connection connection = plugin.getDatabaseConnector().getConnection()) {
+                    DataHelper.prepareStatement(connection, Query.INSERT.getQuery(), uuid.toString(), currency.name(), 0);
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            });
+        }, plugin.getExecutor());
     }
 
     public void remove() {
@@ -39,7 +48,7 @@ public class UserDataManipulator {
     public CompletableFuture<User> get(UUID uuid) {
         return CompletableFuture.supplyAsync(() -> {
             try (Connection connection = plugin.getDatabaseConnector().getConnection();
-                    CachedRowSet rowSet = DataHelper.executeQuery(connection, Query.SELECT_ALL.getQuery(), uuid.toString())) {
+                 CachedRowSet rowSet = DataHelper.executeQuery(connection, Query.SELECT_ALL.getQuery(), uuid.toString())) {
                 User user = new User(uuid);
 
                 while (rowSet.next()) {

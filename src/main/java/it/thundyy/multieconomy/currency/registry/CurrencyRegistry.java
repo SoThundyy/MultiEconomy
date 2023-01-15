@@ -4,10 +4,13 @@ import com.google.common.collect.Maps;
 import it.thundyy.multieconomy.currency.Currency;
 import lombok.Getter;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 public class CurrencyRegistry {
-    private static CurrencyRegistry instance;
+    @Getter(lazy = true)
+    private static final CurrencyRegistry instance = new CurrencyRegistry();
     private final Map<String, Currency> currencies = Maps.newHashMap();
 
     private CurrencyRegistry() {
@@ -29,10 +32,7 @@ public class CurrencyRegistry {
         currencies.remove(name);
     }
 
-    public static synchronized CurrencyRegistry getInstance() {
-        if (instance == null) {
-            instance = new CurrencyRegistry();
-        }
-        return instance;
+    public Collection<Currency> getAll() {
+        return currencies.values();
     }
 }
