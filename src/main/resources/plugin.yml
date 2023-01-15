@@ -1,0 +1,4 @@
+name: MultiEconomy
+version: '${project.version}'
+main: it.thundyy.multieconomy.EconomyPlugin
+api-version: 1.19
